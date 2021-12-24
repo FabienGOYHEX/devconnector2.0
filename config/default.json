@@ -1,3 +1,4 @@
 {
-    "mongoURI":"mongodb+srv://FabienBdc:FabienMarine18@cluster0.l6x5d.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+    "mongoURI":"mongodb+srv://FabienBdc:FabienMarine18@cluster0.l6x5d.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+    "jwtSecret":"mysecrettoken"
 }
