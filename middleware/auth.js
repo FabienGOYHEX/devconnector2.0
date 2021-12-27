@@ -16,6 +16,6 @@ module.exports = function (req, res, next) { // ici la foncton étant un middlew
         req.user = decoded.user;// je récupère l'objet user qui est définit dans le jwt / il est configuré dans le payload dans le fichier users.js, il correspond à l'id du user enregistré en bdd et je le compare au user décodé 
         next()
     } catch (err) {
-        res.staus(401).json({ msg: 'token is not valid ' })
+        res.status(401).json({ msg: 'token is not valid ' })
     }
 }
