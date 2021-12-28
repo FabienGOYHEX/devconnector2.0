@@ -89,5 +89,38 @@ router.post(
         }
 
     }
-)
+);
+
+//@Route        GET api/profile/
+//@Desc        Get all profiles
+//@Statut       Public
+
+router.get('/', async (req, res) => {
+    try {
+        const profiles = await Profile.find().populate('user', ['name', 'avatar'])
+        res.json(profiles)
+    } catch (err) {
+        console.error(err.message)
+        res.status(500).send('server error')
+    }
+})
+
+//@Route        GET api/profile/user/:user_id
+//@Desc        Get profile by user ID
+//@Statut       Public
+
+router.get('/user/:user_id', async (req, res) => {
+    try {
+        const profile = await Profile.findOne({ user: req.params.user_id }).populate('user', ['name', 'avatar'])
+        if (!profile) return res.status(500).json({ msg: 'There is no profile for this user' });
+        res.json(profile)
+    } catch (err) {
+        console.error(err.message)
+        if (err.kind == 'ObjectId') //le.kind permet de comparer le type d'erreur et d'apporte un log erreur différent en fonction
+            return res.status(500).json({ msg: 'Profile not found' }) // Si jamais le user id n'est pas trouvé, cela permet de renvoyer profile nto found au lieu de server error
+        res.status(500).send('Server Error')
+    }
+})
+
+
 module.exports = router
