@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const { check, validationResult } = require('express-validator')
 
 
-const auth = require('../../middleware/auth')
-const Profile = require('../../models/Profile')
-const User = require('../../models/User')
+const auth = require('../../middleware/auth');
+const Profile = require('../../models/Profile');
+const User = require('../../models/User');
 
 
 //@Route        GET api/profile/me
@@ -25,4 +26,68 @@ router.get('/me', auth, async (req, res) => {
     }
 })
 
+//@Route        POST api/profile/
+//@Desc         Create or update a user profile
+//@Statut       Private
+
+router.post(
+    '/',
+    auth,
+    [
+        check('status', 'Status is required').not().isEmpty(),
+        check('skills', 'Skills is required').not().isEmpty(),
+    ],
+    async (req, res) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() })
+        }
+
+        // je destrucutres tous les champs présents dans le body de la requette pour les rendreaccessibles directement
+        const { company, website, location, bio, status, githubusername, skills, youtube, facebook, twitter, instagram, linkedin } = req.body;
+
+        // Build Profile object
+        let profileFields = {}; // je créé un objet vide qui contiendra tous les fields de ma requette 
+        profileFields.user = req.user.id; // je définis que l'id du user de lobjet est égal au user.id présent dans la requette
+        if (company) profileFields.company = company;
+        if (website) profileFields.website = website;
+        if (location) profileFields.location = location;
+        if (bio) profileFields.bio = bio;
+        if (status) profileFields.status = status;
+        if (githubusername) profileFields.githubusername = githubusername;
+        if (skills) {
+
+            profileFields.skills = skills.split(',').map(skill => skill.trim())//Transforme les skills en array
+        }
+        // Build Social network object
+
+        profileFields.social = {};// j'nitailise l'objet 'social' dans profileFields  , si je ne ne le fait pas il ser undefined
+        if (youtube) profileFields.social.youtube = youtube;
+        if (twitter) profileFields.social.twitter = twitter;
+        if (facebook) profileFields.social.facebook = facebook;
+        if (linkedin) profileFields.social.linkedin = linkedin;
+        if (instagram) profileFields.social.instagram = instagram;
+
+        try {
+            let profile = await Profile.findOne({ user: req.user.id })// Je vérifie s'il y a bien un profile exixtant via le user id contenu dans la requette
+            if (profile) { //UPDATE //  Si tu trouves un profil, tu l'update
+                profile = await Profile.findOneAndUpdate(
+                    { user: req.user.id },// tu update en fonction de l'id correspondant au user.id contenu dans la requette
+                    { $set: profileFields }, // Tu lui passes les éléments contenus dans productFields
+                    { new: true }
+                );
+                return res.json(profile)
+            }
+            // CREATE // Si tu ne trouves pas de profil correspondant, tu le créé
+            profile = new Profile(profileFields)
+            await profile.save()
+            res.json(profile)
+
+        } catch (err) {
+            console.error(err.message)
+            res.status(500).send('Servor Errors')
+        }
+
+    }
+)
 module.exports = router
