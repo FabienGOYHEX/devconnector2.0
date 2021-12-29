@@ -53,7 +53,6 @@ router.post('/', [
 
         // Je récupère le mail et le password de la requète
         const { email, password } = req.body;
-        console.log(email)
 
         try {   // J evérifie que l'email corresponde bien à un compte 
             let user = await User.findOne({ email })

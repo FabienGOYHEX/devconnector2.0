@@ -175,4 +175,24 @@ router.put('/experience', [auth, [
         rest.status(500).send('Server Error')
     }
 })
+//@Route        DELETTE api/profile/experience/exp_id
+//@Desc        Delette experience from profile
+//@Statut       Private
+
+router.delete('/experience/:exp_id', auth, async (req, res) => {
+    try { // je récupère le profil correspondant à la requette en bdd
+        const profile = await Profile.findOne({ user: req.user.id })
+        // Je récupère L'id ave le.map et le compare avec celui contenu dans l'url de la requtte avec indexOf
+        const removeIndex = await profile.experience.map(item => item.id).indexOf(req.params.exp_id)
+
+        profile.experience.splice(removeIndex, 1)
+        await profile.save(),
+            res.json(profile)
+
+    } catch (err) {
+        console.error(err.message)
+        res.status(500).send('Server Error')
+    }
+
+})
 module.exports = router
