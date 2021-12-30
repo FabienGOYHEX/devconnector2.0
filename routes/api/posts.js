@@ -54,4 +54,51 @@ router.get('/', auth, async (req, res) => {
         res.status(500).send('Serveur Error')
     }
 })
+
+// @Route           GET api/post/:post_id
+// @Desc            Get post by id
+// @Statuts         Private
+
+router.get('/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ msg: 'Post not found' });
+        }
+        res.json(post)
+    } catch (err) {
+        console.error(err.message);
+        if (err.kind === 'ObjectId') {
+            return res.status(404).json({ msg: 'Post not found' });
+        }
+        res.status(500).send('Serveur Error')
+    }
+})
+// @Route           DELETE api/post/:post_id
+// @Desc            Delete post by id
+// @Statuts         Private
+
+router.delete('/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+
+        if (!post) {
+            return res.status(404).json({ msg: 'Post not found' });
+        }
+
+        // Check if the user is the postman
+        if (post.user.toString() !== req.user.id) { //Post.user est un objet en bdd je dois le transformer en string pour le comparer à req.user.id
+            return res.status(401).json({ msg: 'User not zuthorized' });
+        }
+        await post.remove()
+        res.json({ msg: 'Post removed' })
+    } catch (err) {
+        console.error(err.message);
+        if (err.kind === 'ObjectId') {
+            return res.status(404).json({ msg: 'Post not found' });
+        }
+        res.status(500).send('Serveur Error')
+    }
+})
+
 module.exports = router;
