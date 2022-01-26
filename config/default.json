@@ -1,0 +1,6 @@
+{
+    "mongoURI":"mongodb+srv://FabienBdc:FabienMarine18@cluster0.l6x5d.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+    "jwtSecret":"mysecrettoken",
+    "githubClientId":"f33673eddbbca71f800e",
+    "githubSecret":"5b64fb3f8331ac455948ccd74d5d57b01f0a5d5c"
+}
